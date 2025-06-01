@@ -28,19 +28,23 @@ def process_file(fil):
         # === SELECCIÓN DE PARTÍCULAS ===
      
         part_list = [
-                    ('lp', 11), ('lm', -11),('nup', 12),('num', -12),('bp', 5), ('bm', -5),
-                    #carga positiva
-                    ('q1', 2),    # Quark up-type (u) → PDG 2, carga +2/3
-                    ('q2', -1),   # Antiquark down-type (anti-d) → PDG -1, carga +1/3
-                    ('q3', 4),    # Alternativamente, quark charm (c) → PDG 4, carga +2/3
-                    ('q4', -3),   # o antiquark strange (anti-s) → PDG -3, carga +1/3
-                    #carga negativa
-                    ('q5', -2),    # Antiquark up-type (anti-u) → PDG 2, carga -2/3
-                    ('q6', 1),   # Quark down-type (d) → PDG -1, carga -1/3
-                    ('q7', -4),    # Alternativamente, antiquark charm (anti-c) → PDG 4, carga -2/3
-                    ('q8', 3),   # o quark strange (s) → PDG -3, carga -1/3
-                    ('tp', 6), ('tm', -6)
-                ]
+            ('lp', 11), ('lm', -11), ('nup', 12), ('num', -12), ('bp', 5), ('bm', -5),
+
+            # quarks up-type (primero)
+            ('q1', 2),    # u
+            ('q2', 4),    # c
+            ('q3', -2),   # anti-u
+            ('q4', -4),   # anti-c
+
+            # quarks down-type (después)
+            ('q5', 1),    # d
+            ('q6', 3),    # s
+            ('q7', -1),   # anti-d
+            ('q8', -3),   # anti-s
+
+            ('tp', 6), ('tm', -6)
+        ]
+
             
         particles = {}
         for label, pdgid in part_list:
@@ -62,22 +66,35 @@ def process_file(fil):
 
         # === EMPAREJAMIENTO DE QUARKS ===
         qs = [particles[q] for q in ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8']]
-
-        #ELIMINAMOS VALORES = 0
+        #print(f"VALORES  q1 = {qs[0].Px()}, {qs[0].Py()}, {qs[0].Pz()}, {qs[0].E()}")
+        #print(f"VALORES  q2 = {qs[1].Px()}, {qs[1].Py()}, {qs[1].Pz()}, {qs[1].E()}")
+        #print(f"VALORES  q3 = {qs[2].Px()}, {qs[2].Py()}, {qs[2].Pz()}, {qs[2].E()}")
+        #print(f"VALORES  q4 = {qs[3].Px()}, {qs[3].Py()}, {qs[3].Pz()}, {qs[3].E()}")
+        #print(f"VALORES  q5 = {qs[4].Px()}, {qs[4].Py()}, {qs[4].Pz()}, {qs[4].E()}")
+        #print(f"VALORES  q6 = {qs[5].Px()}, {qs[5].Py()}, {qs[5].Pz()}, {qs[5].E()}")
+        #print(f"VALORES  q7 = {qs[6].Px()}, {qs[6].Py()}, {qs[6].Pz()}, {qs[6].E()}")   
+        #print(f"VALORES  q8 = {qs[7].Px()}, {qs[7].Py()}, {qs[7].Pz()}, {qs[7].E()}")
+        #print(f"VALORES  lp = {ls[0].Px()}, {ls[0].Py()}, {ls[0].Pz()}, {ls[0].E()}")
+        #print(f"VALORES  lm = {ls[1].Px()}, {ls[1].Py()}, {ls[1].Pz()}, {ls[1].E()}")
+        #print(qs)
 
         
-        ls = [particles[q] for q in ['lp','lm'] if particles[q].E() > 1e-10]
+        ls = [particles[q] for q in ['lp','lm'] if particles[q].E() > 1e-20]
+        if len(ls) < 1:
+            continue
         nus = [particles[q] for q in ['nup', 'num'] if particles[q].E() > 1e-10]
         qs = [particles[q] for q in ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8']  if particles[q].E() > 1e-10]
 
-        if len(ls) < 1:
-            continue
+        #print(f"Valores  q1 = {qs[0].Px()}, {qs[0].Py()}, {qs[0].Pz()}, {qs[0].E()}")
+        #print(f"Valores  q2 = {qs[1].Px()}, {qs[1].Py()}, {qs[1].Pz()}, {qs[1].E()}")
+        #print(f"Valores  lp = {ls[0].Px()}, {ls[0].Py()}, {ls[0].Pz()}, {ls[0].E()}")
+        #print(qs)
+        
         
     
         
 
-       #NO HACE FALTA ORGANIZAR LOS QUARKS PORQUE EN LA SEGUNDA POSICIÓN SIEMPRE ESTARA EL ANTIQUARK
-
+       #NO HACE FALTA ORGANIZAR LOS QUARKS PORQUE EN LA SEGUNDA POSICIÓN SIEMPRE ESTARA EL Down-type
         
         """if random.random() < 0.5:
             random.shuffle(qs)
@@ -128,21 +145,21 @@ def process_file(fil):
 
         # === CAMBIO: SOLO UN LEPTÓN EN EL SISTEMA DEL TTBAR ===
         
-        lp = deepcopy(ls[0])
+        lp=deepcopy(ls[0])
         lp.Boost(-boost_ttbar)
-
         lp_hat = lp.Vect().Unit()
 
+    
         
-        #sea q1 el anti-quark type
+        #sea q1 el down-quark type porque lo hemos ordenado
         q1 = qs[1]
-        anti_quark = deepcopy(q1)
-        anti_quark.Boost(-boost_ttbar)
-        anti_hat = anti_quark.Vect().Unit()
+        down_quark = deepcopy(q1)
+        down_quark.Boost(-boost_ttbar)
+        down_hat = down_quark.Vect().Unit()
 
-        cnr_crn = n_hat.Dot(lp_hat) * r_hat.Dot(anti_hat) - r_hat.Dot(lp_hat) * n_hat.Dot(anti_hat)
-        cnk_ckn = n_hat.Dot(lp_hat) * k_hat.Dot(anti_hat) - k_hat.Dot(lp_hat) * n_hat.Dot(anti_hat)
-        crk_ckr = r_hat.Dot(lp_hat) * k_hat.Dot(anti_hat) - k_hat.Dot(lp_hat) * r_hat.Dot(anti_hat)
+        cnr_crn = n_hat.Dot(lp_hat) * r_hat.Dot(down_hat) - r_hat.Dot(lp_hat) * n_hat.Dot(down_hat)
+        cnk_ckn = n_hat.Dot(lp_hat) * k_hat.Dot(down_hat) - k_hat.Dot(lp_hat) * n_hat.Dot(down_hat)
+        crk_ckr = r_hat.Dot(lp_hat) * k_hat.Dot(down_hat) - k_hat.Dot(lp_hat) * r_hat.Dot(down_hat)
 
         toret.extend([cnr_crn, cnk_ckn, crk_ckr])
 

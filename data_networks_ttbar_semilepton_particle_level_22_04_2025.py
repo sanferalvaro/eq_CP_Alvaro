@@ -26,7 +26,7 @@ class dataset( Dataset ):
 
         self.variables = torch.Tensor(big_df[['l_px', 'l_py', 'l_pz',
                                         'b1_px', 'b1_py', 'b1_pz',
-                                        'b2_px', 'b2_py', 'b2_pz',
+                                        'b2_px', 'b2_py', 'b2_pz',   
                                         'q1_px', 'q1_py', 'q1_pz',
                                         'q2_px', 'q2_py', 'q2_pz',
                                         'met_px', 'met_py']].values).to(self.device)
@@ -68,10 +68,10 @@ class Network(nn.Module):
 
     def forward(self, x):
         cpx= torch.stack([-x[:,0], -x[:,1] , -x[:,2],    # -lep
-                          -x[:,6], -x[:,7] , -x[:,8],    # -b2 
-                          -x[:,3], -x[:,4], -x[:,5],     # -b1 # this shouldnt add information but ok 
-                          -x[:,12], -x[:,13] , -x[:,14], # -q2
-                          -x[:,9], -x[:,10] , -x[:,11],  # -q1
+                          -x[:,3], -x[:,4], -x[:,5],     # -b1
+                          -x[:,6], -x[:,7], -x[:,8],     # -b2 
+                          -x[:,12], -x[:,13], -x[:,14],  # -q2
+                          -x[:,9], -x[:,10] , -x[:,11],  # -q
                           -x[:,15], -x[:,16]          ],  # -met
                          dim=1).to(self.device)
         return self.main_module(x)-self.main_module(cpx)
